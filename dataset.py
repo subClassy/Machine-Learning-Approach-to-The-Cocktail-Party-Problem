@@ -98,7 +98,7 @@ def readAudioScipy(filein):
         maxv = np.finfo(bitrate).max
     except:
         maxv = np.iinfo(bitrate).max
-    return audioObj.astype('float')/maxv, sampleRate, bitrate
+    return audioObj.astype('float'), sampleRate, bitrate
 
 
 n_window = 1024
@@ -108,6 +108,7 @@ ham_win = np.hamming(n_window)
 
 class SingleAudio():
     def __init__(self, audio_path):
+        self.audio_path = audio_path
         self.mixed_spectrogram = self.generate_spectrogram(audio_path)
         self.num_samples = 20
         self.padded_spectrogram = np.pad(
@@ -175,15 +176,36 @@ class SingleAudio():
         plt.figure(figsize=(18, 16), dpi= 60, facecolor='w', edgecolor='k')
         specshow(voice, sr=16000, x_axis='time', y_axis='hz', x_coords=np.linspace(0, 1, voice.shape[1]))
         plt.xlabel("Time (s)")
-        plt.title("Clean Spectrogram", fontsize=14)
+        plt.title("Generated Clean Spectrogram", fontsize=14)
         # plt.colorbar(format='%+02.0f dB')
-        # plt.savefig('clean_predicted.png')
-        plt.show()
-        # plt.clf()
+        plt.savefig('clean_predicted.png')
+        # plt.show()
 
-        # plt.figure(figsize=(18, 16), dpi= 60, facecolor='w', edgecolor='k')
-        # specshow(noise, sr=16000, x_axis='time', y_axis='hz', x_coords=np.linspace(0, 1, noise.shape[1]))
-        # plt.xlabel("Time (s)")
-        # plt.title("Noise Spectrogram", fontsize=14)
+        plt.clf()
+
+        plt.figure(figsize=(18, 16), dpi= 60, facecolor='w', edgecolor='k')
+        specshow(self.mixed_spectrogram, sr=16000, x_axis='time', y_axis='hz', x_coords=np.linspace(0, 1, noise.shape[1]))
+        plt.xlabel("Time (s)")
+        plt.title("Mixed Spectrogram", fontsize=14)
         # plt.colorbar(format='%+02.0f dB')
-        # plt.savefig('noise_predicted.png')
+        plt.savefig('mixed.png')
+
+        plt.clf()
+
+        clean_dir = '/home/ankur/Downloads/Others/dev-clean'
+        clean_name = self.audio_path.split('/')[-1].split('__')[0] + '.flac'
+        clean_audio, fs = librosa.load(os.path.join(clean_dir, clean_name), sr = 16000, duration = 4)
+        [f, t, clean_spec] = spectral.spectrogram(
+            x=clean_audio,
+            window=ham_win,
+            nperseg=n_window,
+            noverlap=n_overlap,
+            detrend=False,
+            return_onesided=True,
+            mode='magnitude')
+        plt.figure(figsize=(18, 16), dpi= 60, facecolor='w', edgecolor='k')
+        specshow(clean_spec.T, sr=16000, x_axis='time', y_axis='hz', x_coords=np.linspace(0, 1, noise.shape[1]))
+        plt.xlabel("Time (s)")
+        plt.title("Actual Clean Spectrogram", fontsize=14)
+        # plt.colorbar(format='%+02.0f dB')
+        plt.savefig('clean.png')

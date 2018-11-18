@@ -13,6 +13,7 @@ print('Loaded model from disk')
 
 audio_path = '/home/ankur/Downloads/Others/mixed'
 audio_name = '174-50561-0010__door_wood_knock_1-52290-A-30.wav'
+audio_name1 = '84-121550-0009__door_wood_knock_4-188878-A-30.wav'#0.72
 single_audio = SingleAudio(os.path.join(audio_path, audio_name))
 
 for i in range(len(single_audio)):
@@ -23,4 +24,4 @@ for i in range(len(single_audio)):
     single_audio.update_matrix(predicted_mask, i)
 
 print("Generating Spectrograms...")
-single_audio.plot_spectrograms(0.66)
+single_audio.plot_spectrograms(0.68)
